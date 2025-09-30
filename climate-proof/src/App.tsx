@@ -1,6 +1,5 @@
 import "./App.css";
 import { PortfolioPage } from "./components/PortfolioPage";
-import { TestHTMLReport } from "./components/TestHTMLReport";
 
 function App() {
   return (

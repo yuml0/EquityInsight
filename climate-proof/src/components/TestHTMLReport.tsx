@@ -1,4 +1,3 @@
-import React from "react";
 import { HTMLReportGenerator } from "./HTMLReportGenerator";
 import type { PortfolioCompany } from "./PortfolioManager";
 import type { PortfolioMetrics } from "./portfolio-views/types";

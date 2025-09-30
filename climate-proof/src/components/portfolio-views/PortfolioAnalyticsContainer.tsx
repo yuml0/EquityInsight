@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Card,
   CardContent,
@@ -30,8 +30,14 @@ import { GeographyAnalysisView } from "./GeographyAnalysisView";
 import { HazardAnalysisView } from "./HazardAnalysisView";
 import { HorizonAnalysisView } from "./HorizonAnalysisView";
 import { TopNDriversView } from "./TopNDriversView";
+import { HTMLReportGenerator } from "../HTMLReportGenerator";
 import type { PortfolioCompany } from "../PortfolioManager";
 import type { PortfolioMetrics } from "./types";
+import { useSectorData, useSectorQueries } from "./hooks";
+import { useGeographyData, useGeographyQueries } from "./hooks";
+import { useHazardData, useHazardQueries } from "./hooks";
+import { useHorizonData, useHorizonQueries } from "./hooks";
+import { useTopNDriversData } from "./hooks";
 
 interface PortfolioAnalyticsContainerProps {
   companies: PortfolioCompany[];
@@ -100,7 +106,51 @@ export function PortfolioAnalyticsContainer({
   const [risk, setRisk] = useState(selectedRisk);
   const [metric, setMetric] = useState(selectedMetric);
 
-  // Individual queries are now handled within each view component
+  // Data hooks for all analysis views
+  const { sectorQueries } = useSectorQueries(
+    companies,
+    horizon,
+    pathway,
+    risk,
+    metric,
+  );
+  const sectorData = useSectorData(companies, sectorQueries);
+
+  const { geographyQueries } = useGeographyQueries(
+    companies,
+    horizon,
+    pathway,
+    risk,
+    metric,
+  );
+  const geographyData = useGeographyData(companies, geographyQueries);
+
+  const { companyClimateQueries: hazardQueries } = useHazardQueries(
+    companies,
+    horizon,
+    pathway,
+    risk,
+    metric,
+  );
+  const hazardData = useHazardData(companies, hazardQueries);
+
+  const { companyClimateQueries: horizonQueries } = useHorizonQueries(
+    companies,
+    horizon,
+    pathway,
+    risk,
+    metric,
+  );
+  const horizonData = useHorizonData(companies, horizonQueries, HORIZONS);
+
+  const topNDriversData = useTopNDriversData(
+    companies,
+    hazardQueries,
+    horizon,
+    pathway,
+    risk,
+    metric,
+  );
 
   // Calculate portfolio metrics
   const portfolioMetrics: PortfolioMetrics = {
@@ -110,7 +160,33 @@ export function PortfolioAnalyticsContainer({
     highRiskCompanies: Math.floor(companies.length * 0.3),
   };
 
-  // Loading and error states are now handled within each individual view component
+  // Generate report data for HTML export
+  const reportData = useMemo(() => ({
+    companies,
+    portfolioMetrics,
+    sectorData,
+    geographyData,
+    hazardData,
+    horizonData,
+    topNDriversData,
+    selectedHorizon: horizon,
+    selectedPathway: pathway,
+    selectedRisk: risk,
+    selectedMetric: metric,
+    generatedAt: new Date(),
+  }), [
+    companies,
+    portfolioMetrics,
+    sectorData,
+    geographyData,
+    hazardData,
+    horizonData,
+    topNDriversData,
+    horizon,
+    pathway,
+    risk,
+    metric,
+  ]);
 
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -188,11 +264,16 @@ export function PortfolioAnalyticsContainer({
       {/* Filter Controls */}
       <Card className="flex-shrink-0">
         <CardHeader>
-          <CardTitle>Analysis Filters</CardTitle>
-          <CardDescription>
-            Adjust parameters to analyze different climate scenarios and risk
-            metrics
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Analysis Filters</CardTitle>
+              <CardDescription>
+                Adjust parameters to analyze different climate scenarios and
+                risk metrics
+              </CardDescription>
+            </div>
+            <HTMLReportGenerator {...reportData} />
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

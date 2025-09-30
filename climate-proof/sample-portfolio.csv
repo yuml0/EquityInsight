@@ -1,0 +1,7 @@
+Company ID,Company Name,Sector,Weight (%),Stock Tickers,ISIN Codes
+sample-1,"Tesla Inc.",Automotive,25.0,TSLA,US88160R1014
+sample-2,"NextEra Energy Inc.",Utilities,20.0,NEE,US65339F1012
+sample-3,"Vestas Wind Systems A/S",Industrial Goods,15.0,VWS,DK0010268606
+sample-4,"First Solar Inc.",Technology,15.0,FSLR,US3364331070
+sample-5,"Brookfield Renewable Partners L.P.",Utilities,12.5,BEP,CA11271L1064
+sample-6,"Plug Power Inc.",Technology,12.5,PLUG,US72919P2020

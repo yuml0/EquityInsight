@@ -259,22 +259,6 @@ Required environment variables:
 - **Import Portfolio**: Upload previously saved portfolio files
 - **Generate Reports**: Create HTML reports with comprehensive analytics
 
-## 🔍 Available Scripts
-
-```bash
-# Development
-pnpm dev              # Start development server
-pnpm build            # Build for production
-pnpm serve            # Preview production build
-
-# Code Quality
-pnpm format           # Format code with Biome
-pnpm lint             # Lint code with Biome
-pnpm check            # Run all Biome checks
-
-# API Generation
-pnpm openapi-ts       # Generate TypeScript client from OpenAPI spec
-```
 
 ## 🌐 API Integration
 
@@ -301,10 +285,6 @@ Built with a comprehensive design system using:
 - The `.env` file is gitignored to prevent accidental commits
 - All data is processed client-side with localStorage persistence
 - No sensitive data is stored on external servers
-
-## 📄 License
-
-This project is private and proprietary.
 
 ## 🆘 Support
 

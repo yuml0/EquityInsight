@@ -9,65 +9,48 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ApiChatRouteImport } from './routes/api.chat'
+import { Route as ServerChatRouteImport } from './routes/server.chat'
 
-const PortfolioRoute = PortfolioRouteImport.update({
-  id: '/portfolio',
-  path: '/portfolio',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiChatRoute = ApiChatRouteImport.update({
-  id: '/api/chat',
-  path: '/api/chat',
+const ServerChatRoute = ServerChatRouteImport.update({
+  id: '/server/chat',
+  path: '/server/chat',
   getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/portfolio': typeof PortfolioRoute
-  '/api/chat': typeof ApiChatRoute
+  '/server/chat': typeof ServerChatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/portfolio': typeof PortfolioRoute
-  '/api/chat': typeof ApiChatRoute
+  '/server/chat': typeof ServerChatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/portfolio': typeof PortfolioRoute
-  '/api/chat': typeof ApiChatRoute
+  '/server/chat': typeof ServerChatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/portfolio' | '/api/chat'
+  fullPaths: '/' | '/server/chat'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/portfolio' | '/api/chat'
-  id: '__root__' | '/' | '/portfolio' | '/api/chat'
+  to: '/' | '/server/chat'
+  id: '__root__' | '/' | '/server/chat'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  PortfolioRoute: typeof PortfolioRoute
-  ApiChatRoute: typeof ApiChatRoute
+  ServerChatRoute: typeof ServerChatRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/portfolio': {
-      id: '/portfolio'
-      path: '/portfolio'
-      fullPath: '/portfolio'
-      preLoaderRoute: typeof PortfolioRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -75,11 +58,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/chat': {
-      id: '/api/chat'
-      path: '/api/chat'
-      fullPath: '/api/chat'
-      preLoaderRoute: typeof ApiChatRouteImport
+    '/server/chat': {
+      id: '/server/chat'
+      path: '/server/chat'
+      fullPath: '/server/chat'
+      preLoaderRoute: typeof ServerChatRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -87,8 +70,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  PortfolioRoute: PortfolioRoute,
-  ApiChatRoute: ApiChatRoute,
+  ServerChatRoute: ServerChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

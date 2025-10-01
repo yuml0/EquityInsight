@@ -1,373 +1,287 @@
-# EquityInsight - Portfolio Climate Risk Analytics
+# EquityInsight
+
+**Portfolio Climate Risk Analytics for Canadian Equities**
 
 A comprehensive analytics workflow that transforms company and asset-level data
-into portfolio-level climate risk insights and scenario narratives for Canadian
-equities.
+into portfolio-level climate risk insights and scenario narratives. Built with
+React, TypeScript, and powered by AI to provide intelligent climate risk
+analysis for investment portfolios.
 
-## Overview
+## 🚀 Features
 
-EquityInsight provides portfolio-level climate risk analysis through:
+### Portfolio Management
 
-- **Company & Asset Metrics Retrieval**: Gathers comprehensive climate risk data
-  for individual companies and their assets
-- **Portfolio Aggregation**: Creates multi-dimensional views by sector,
-  geography, hazard type, and time horizon
-- **Risk Concentration Analysis**: Identifies concentration risks and enables
-  what-if scenario modeling
-- **Actionable Insights**: Surfaces top risk drivers and provides
-  recommendations for portfolio optimization
-- **Interactive Dashboard**: Features filters for hazard type, horizon, and
-  sector analysis
-- **Report Generation**: Produces HTML/PDF reports for investor and
-  sustainability audiences
+- **Company Search & Selection**: Search and add companies to your portfolio
+  using fuzzy search by name, ticker, ISIN, or sector
+- **Weight Management**: Set custom portfolio weights or use equal-weight
+  distribution
+- **Portfolio Persistence**: Automatic saving to localStorage with import/export
+  capabilities (JSON & CSV)
+- **Real-time Validation**: Weight normalization and validation to ensure 100%
+  allocation
 
-## Features
+### Climate Risk Analytics
 
-### Core Analytics
+- **Multi-dimensional Analysis**:
+  - **Sector Analysis**: Risk distribution across GICS sectors
+  - **Geographic Analysis**: Risk exposure by country and region
+  - **Hazard Analysis**: Physical climate risk assessment
+  - **Horizon Analysis**: Risk evolution over time (2025-2100)
+  - **Top-N Drivers**: Key risk drivers and concentration metrics
 
-- Portfolio risk aggregation across multiple dimensions
-- Climate hazard analysis (heatwaves, floods, storms, etc.)
-- Geographic and sector concentration risk assessment
-- Time horizon analysis (short, medium, long-term risks)
+- **Advanced Risk Metrics**:
+  - DCR Scores (Damage Cost Ratio)
+  - Expected Impact
+  - Value at Risk (VaR) at 50%, 95%, 99% confidence levels
+  - Conditional VaR (CVaR) at multiple confidence levels
 
-### Scenario Analysis
+- **Climate Scenarios**: Support for multiple climate pathways including SSP
+  scenarios and temperature targets
 
-- What-if scenario modeling (e.g., increased heatwave frequency)
-- Risk driver identification and prioritization
-- Portfolio optimization recommendations
+### AI-Powered Assistant
 
-### Interactive Interface
+- **Intelligent Chat Interface**: AI assistant powered by Google Gemini 2.5
+  Flash
+- **Portfolio Context Awareness**: Access to current portfolio and analytics
+  settings
+- **Comprehensive Data Access**: Query companies, assets, market indexes, and
+  climate data
+- **Natural Language Queries**: Ask questions about climate risk, portfolio
+  analysis, and data insights
 
-- Real-time portfolio analysis dashboard
-- Advanced filtering capabilities
-- Natural language query interface (planned)
+### Data Integration
 
-## Getting Started
+- **RiskThinking.ai API**: Real-time climate risk data for Canadian equities
+- **Comprehensive Coverage**: Companies, physical assets, market indexes, and
+  climate metrics
+- **Geographic Clustering**: Advanced mapping and location-based analysis
+- **Asset-Level Detail**: Granular analysis down to individual physical assets
 
-To run this application:
+## 🛠️ Tech Stack
+
+- **Frontend**: React 19, TypeScript, Vite
+- **Routing**: TanStack Router with SSR support
+- **State Management**: TanStack Query for server state
+- **UI Components**: Radix UI primitives with Tailwind CSS
+- **AI Integration**: AI SDK with Google Gemini 2.5 Flash
+- **Data Fetching**: OpenAPI-generated TypeScript client
+- **Build Tools**: Vite, Biome (linting/formatting)
+
+## 📋 Prerequisites
+
+- Node.js 18+
+- pnpm (recommended) or npm
+- Modern web browser with ES2022 support
+
+## 🚀 Quick Start
+
+### 1. Install Dependencies
 
 ```bash
+# Using pnpm (recommended)
 pnpm install
-pnpm start
+
+# Or using npm
+npm install
 ```
 
-# Building For Production
+### 2. Configure Environment Variables
 
-To build this application for production:
+Copy the environment template and add your API keys:
 
 ```bash
+cp .env.example .env
+```
+
+You'll need to obtain API keys from:
+
+- **RiskThinking.ai**: For climate risk data (contact RiskThinking.ai for
+  access)
+- **Google AI Studio**: For the AI assistant (get your free API key at
+  [Google AI Studio](https://aistudio.google.com/app/apikey))
+
+Edit `.env` and add your actual API keys.
+
+### 3. Start Development Server
+
+```bash
+# Using pnpm
+pnpm dev
+
+# Or using npm
+npm run dev
+```
+
+The application will be available at `http://localhost:12306`
+
+### 4. Build for Production
+
+```bash
+# Using pnpm
 pnpm build
+
+# Or using npm
+npm run build
 ```
 
-## Testing
+## 📁 Project Structure
 
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the
-tests with:
+```
+src/
+├── components/           # React components
+│   ├── ui/              # Reusable UI components (Radix UI + Tailwind)
+│   ├── portfolio-views/ # Analytics visualization components
+│   ├── PortfolioManager.tsx    # Portfolio management interface
+│   ├── CompanySearch.tsx       # Company search and selection
+│   ├── ChatBot.tsx            # AI assistant interface
+│   └── HTMLReportGenerator.tsx # Report generation
+├── client/              # Auto-generated API client
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility functions and tools
+│   ├── chatbot-tools.ts # AI assistant tool definitions
+│   └── portfolio-utils.ts # Portfolio management utilities
+├── routes/              # TanStack Router routes
+│   ├── index.tsx        # Main portfolio page
+│   └── server.chat.ts   # AI chat API endpoint
+└── main.tsx            # Application entry point
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+The application requires environment variables for API configuration. Copy
+`.env.example` to `.env` and configure your API key:
 
 ```bash
-pnpm test
+cp .env.example .env
 ```
 
-## Styling
+Required environment variables:
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+- `VITE_RISKTHINKING_API_KEY`: Your RiskThinking.ai API key
+- `VITE_RISKTHINKING_API_BASE_URL`: API base URL (defaults to
+  https://api.riskthinking.ai)
+- `GOOGLE_GENERATIVE_AI_API_KEY`: Your Google Generative AI API key for the AI
+  assistant
 
-## Linting & Formatting
+### API Configuration
 
-This project uses [Biome](https://biomejs.dev/) for linting and formatting. The
-following scripts are available:
+The application connects to the RiskThinking.ai API through a Vite proxy
+configuration:
 
-```bash
-pnpm lint
-pnpm format
-pnpm check
-```
-
-## Shadcn
-
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
-
-```bash
-pnpx shadcn@latest add button
-```
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router). The initial
-setup is a file based router. Which means that the routes are managed as files
-in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add another a new file in the
-`./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between
-them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the
-`Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>;
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the
-[Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in
-`src/routes/__root.tsx`. Anything you add to the root route will appear in all
-the routes. The route content will appear in the JSX where you use the
-`<Outlet />` component.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
-
-import { Link } from "@tanstack/react-router";
-
-export const Route = createRootRoute({
-  component: () => (
-    <>
-      <header>
-        <nav>
-          <Link to="/">Home</Link>
-          <Link to="/about">About</Link>
-        </nav>
-      </header>
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
-
-The `<TanStackRouterDevtools />` component is not required so you can remove it
-if you don't want it in your layout.
-
-More information on layouts can be found in the
-[Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack
-Query to fetch data from a server. But you can also use the `loader`
-functionality built into TanStack Router to load the data for a route before
-it's rendered.
-
-For example:
-
-```tsx
-const peopleRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "/people",
-  loader: async () => {
-    const response = await fetch("https://swapi.dev/api/people");
-    return response.json() as Promise<{
-      results: {
-        name: string;
-      }[];
-    }>;
+```typescript
+// vite.config.ts
+server: {
+  proxy: {
+    '/api': {
+      target: 'https://api.riskthinking.ai',
+      changeOrigin: true,
+      secure: true,
+      rewrite: (path) => path.replace(/^\/api/, ''),
+    },
   },
-  component: () => {
-    const data = peopleRoute.useLoaderData();
-    return (
-      <ul>
-        {data.results.map((person) => <li key={person.name}>{person.name}</li>)}
-      </ul>
-    );
-  },
-});
+}
 ```
 
-Loaders simplify your data fetching logic dramatically. Check out more
-information in the
-[Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
+## 🎯 Usage Guide
 
-### React-Query
+### Building a Portfolio
 
-React-Query is an excellent addition or alternative to route loading and
-integrating it into you application is a breeze.
+1. **Search Companies**: Use the search interface to find companies by name,
+   ticker, ISIN, or sector
+2. **Add to Portfolio**: Click "Add to Portfolio" to include companies
+3. **Set Weights**: Adjust portfolio weights manually or enable equal-weight
+   distribution
+4. **Validate Allocation**: Ensure total weights sum to 100%
 
-First add your dependencies:
+### Climate Risk Analysis
+
+1. **Access Analytics**: Switch to the "Climate Analytics" tab (requires
+   portfolio with non-zero weights)
+2. **Configure Filters**: Set time horizon, climate pathway, risk type, and
+   metric
+3. **Explore Views**: Navigate through different analysis dimensions:
+   - **Sector**: Risk distribution by industry
+   - **Geography**: Geographic risk exposure
+   - **Hazard**: Physical climate hazards
+   - **Horizon**: Risk evolution over time
+   - **Top-N Drivers**: Key risk factors
+
+### AI Assistant
+
+1. **Open Chat**: Switch to the "AI Assistant" tab
+2. **Ask Questions**: Query about your portfolio, climate risk, or specific
+   companies
+3. **Get Insights**: The AI can access your current portfolio and provide
+   data-driven analysis
+
+### Export/Import
+
+- **Export Portfolio**: Download portfolio as JSON or CSV
+- **Import Portfolio**: Upload previously saved portfolio files
+- **Generate Reports**: Create HTML reports with comprehensive analytics
+
+## 🔍 Available Scripts
 
 ```bash
-pnpm add @tanstack/react-query @tanstack/react-query-devtools
+# Development
+pnpm dev              # Start development server
+pnpm build            # Build for production
+pnpm serve            # Preview production build
+
+# Code Quality
+pnpm format           # Format code with Biome
+pnpm lint             # Lint code with Biome
+pnpm check            # Run all Biome checks
+
+# API Generation
+pnpm openapi-ts       # Generate TypeScript client from OpenAPI spec
 ```
 
-Next we'll need to create a query client and provider. We recommend putting
-those in `main.tsx`.
+## 🌐 API Integration
 
-```tsx
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+The application integrates with the RiskThinking.ai API providing:
 
-// ...
+- **Company Data**: Search, details, and metadata
+- **Asset Information**: Physical asset locations and details
+- **Climate Metrics**: Risk scores, impacts, and scenarios
+- **Market Data**: Index and market group information
+- **Geographic Data**: Location-based clustering and mapping
 
-const queryClient = new QueryClient();
+## 🎨 UI Components
 
-// ...
+Built with a comprehensive design system using:
 
-if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement);
+- **Radix UI**: Accessible, unstyled components
+- **Tailwind CSS**: Utility-first styling
+- **Lucide React**: Consistent iconography
+- **Custom Components**: Specialized portfolio and analytics components
 
-  root.render(
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-    </QueryClientProvider>,
-  );
-}
-```
+## 🔒 Security Considerations
 
-You can also add TanStack Query Devtools to the root route (optional).
+- API keys are stored in environment variables (`.env` file)
+- The `.env` file is gitignored to prevent accidental commits
+- All data is processed client-side with localStorage persistence
+- No sensitive data is stored on external servers
 
-```tsx
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+## 🤝 Contributing
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Outlet />
-      <ReactQueryDevtools buttonPosition="top-right" />
-      <TanStackRouterDevtools />
-    </>
-  ),
-});
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting: `pnpm check`
+5. Submit a pull request
 
-Now you can use `useQuery` to fetch your data.
+## 📄 License
 
-```tsx
-import { useQuery } from "@tanstack/react-query";
+This project is private and proprietary.
 
-import "./App.css";
+## 🆘 Support
 
-function App() {
-  const { data } = useQuery({
-    queryKey: ["people"],
-    queryFn: () =>
-      fetch("https://swapi.dev/api/people")
-        .then((res) => res.json())
-        .then((data) => data.results as { name: string }[]),
-    initialData: [],
-  });
+For technical support or questions about the application, please refer to the
+codebase documentation or contact the development team.
 
-  return (
-    <div>
-      <ul>
-        {data.map((person) => <li key={person.name}>{person.name}</li>)}
-      </ul>
-    </div>
-  );
-}
+---
 
-export default App;
-```
-
-You can find out everything you need to know on how to use React-Query in the
-[React-Query documentation](https://tanstack.com/query/latest/docs/framework/react/overview).
-
-## State Management
-
-Another common requirement for React applications is state management. There are
-many options for state management in React. TanStack Store provides a great
-starting point for your project.
-
-First you need to add TanStack Store as a dependency:
-
-```bash
-pnpm add @tanstack/store
-```
-
-Now let's create a simple counter in the `src/App.tsx` file as a demonstration.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-function App() {
-  const count = useStore(countStore);
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-    </div>
-  );
-}
-
-export default App;
-```
-
-One of the many nice features of TanStack Store is the ability to derive state
-from other state. That derived state will update when the base state updates.
-
-Let's check this out by doubling the count using derived state.
-
-```tsx
-import { useStore } from "@tanstack/react-store";
-import { Derived, Store } from "@tanstack/store";
-import "./App.css";
-
-const countStore = new Store(0);
-
-const doubledStore = new Derived({
-  fn: () => countStore.state * 2,
-  deps: [countStore],
-});
-doubledStore.mount();
-
-function App() {
-  const count = useStore(countStore);
-  const doubledCount = useStore(doubledStore);
-
-  return (
-    <div>
-      <button onClick={() => countStore.setState((n) => n + 1)}>
-        Increment - {count}
-      </button>
-      <div>Doubled - {doubledCount}</div>
-    </div>
-  );
-}
-
-export default App;
-```
-
-We use the `Derived` class to create a new store that is derived from another
-store. The `Derived` class has a `mount` method that will start the derived
-store updating.
-
-Once we've created the derived store we can use it in the `App` component just
-like we would any other store using the `useStore` hook.
-
-You can find out everything you need to know on how to use TanStack Store in the
-[TanStack Store documentation](https://tanstack.com/store/latest).
-
-# Demo files
-
-Files prefixed with `demo` can be safely deleted. They are there to provide a
-starting point for you to play around with the features you've installed.
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the
-[TanStack documentation](https://tanstack.com).
+**Built with ❤️ for climate-conscious investing**

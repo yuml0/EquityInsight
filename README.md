@@ -1,5 +1,7 @@
 # EquityInsight
 
+A live demo for this project is deployed at [https://equity-insight.yumengliu.ca/](https://equity-insight.yumengliu.ca/).
+
 **Portfolio Climate Risk Analytics for Canadian Equities**
 
 A comprehensive analytics workflow that transforms company and asset-level data
@@ -123,7 +125,11 @@ analysis for investment portfolios.
 
 ## 🚀 Quick Start
 
-Before the following operations, be 
+Before the following operations, be sure to go into the subfolder:
+
+```bash
+cd EquityInsight
+```
 
 ### 1. Install Dependencies
 

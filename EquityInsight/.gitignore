@@ -10,3 +10,7 @@ count.txt
 .output
 .vinxi
 todos.json
+
+# Cloudflare
+.wrangler
+wrangler.json

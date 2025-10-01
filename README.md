@@ -123,6 +123,8 @@ analysis for investment portfolios.
 
 ## 🚀 Quick Start
 
+Before the following operations, be 
+
 ### 1. Install Dependencies
 
 ```bash

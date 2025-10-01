@@ -69,9 +69,57 @@ analysis for investment portfolios.
 
 ## 📋 Prerequisites
 
-- Node.js 18+
+- Node.js 22+
 - pnpm (recommended) or npm
 - Modern web browser with ES2022 support
+
+## 🔧 Installation
+
+### Install Node.js
+
+1. **Download Node.js**:
+   - Visit [nodejs.org](https://nodejs.org/)
+   - Download the LTS version (22.x or higher)
+   - Follow the installation instructions for your operating system
+
+2. **Verify Installation**:
+   ```bash
+   node --version
+   npm --version
+   ```
+
+### Install pnpm (Recommended)
+
+1. **Using npm** (if you have Node.js installed):
+   ```bash
+   npm install -g pnpm
+   ```
+
+2. **Using Corepack** (Node.js 16.13+):
+   ```bash
+   corepack enable
+   corepack prepare pnpm@latest --activate
+   ```
+
+3. **Using Homebrew** (macOS):
+   ```bash
+   brew install pnpm
+   ```
+
+4. **Using curl** (Linux/macOS):
+   ```bash
+   curl -fsSL https://get.pnpm.io/install.sh | sh -
+   ```
+
+5. **Using PowerShell** (Windows):
+   ```powershell
+   iwr https://get.pnpm.io/install.ps1 -useb | iex
+   ```
+
+6. **Verify pnpm Installation**:
+   ```bash
+   pnpm --version
+   ```
 
 ## 🚀 Quick Start
 

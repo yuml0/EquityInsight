@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
+  getMultipleCompanyClimateScores,
+  getMultipleCompanyClimateScoresAggregation,
+} from "../lib/server-functions";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -45,10 +49,6 @@ import {
   Shield,
 } from "lucide-react";
 import type { PortfolioCompany } from "./PortfolioManager";
-import {
-  getV3CompaniesCompanyIdAssetsClimateScoresAggregationOptions,
-  getV3CompaniesCompanyIdClimateScoresOptions,
-} from "../client/@tanstack/react-query.gen";
 
 interface PortfolioAggregationViewProps {
   companies: PortfolioCompany[];
@@ -104,67 +104,96 @@ export function PortfolioAggregationView({
   );
 
   // Fetch climate scores for each company by sector
-  const sectorQueries = companyIds.map((companyId) =>
-    useQuery({
-      ...getV3CompaniesCompanyIdAssetsClimateScoresAggregationOptions({
-        path: { company_id: companyId },
-        query: {
+  const {
+    data: sectorData,
+    isLoading: sectorLoading,
+    error: sectorError,
+  } = useQuery({
+    queryKey: [
+      "sectorClimateScores",
+      companyIds,
+      horizon,
+      pathway,
+      risk,
+      metric,
+    ],
+    queryFn: () =>
+      getMultipleCompanyClimateScoresAggregation({
+        data: {
+          company_ids: companyIds,
           horizon,
           pathway,
           risk,
           metric,
-          by: "asset_type", // This will give us sector-level data
+          by: "asset_type",
         },
       }),
-      enabled: !!companyId,
-    })
-  );
+    enabled: companyIds.length > 0,
+  });
 
   // Fetch climate scores for each company by geography
-  const geographyQueries = companyIds.map((companyId) =>
-    useQuery({
-      ...getV3CompaniesCompanyIdAssetsClimateScoresAggregationOptions({
-        path: { company_id: companyId },
-        query: {
+  const {
+    data: geographyData,
+    isLoading: geographyLoading,
+    error: geographyError,
+  } = useQuery({
+    queryKey: [
+      "geographyClimateScores",
+      companyIds,
+      horizon,
+      pathway,
+      risk,
+      metric,
+    ],
+    queryFn: () =>
+      getMultipleCompanyClimateScoresAggregation({
+        data: {
+          company_ids: companyIds,
           horizon,
           pathway,
           risk,
           metric,
-          by: "country", // This will give us geography-level data
+          by: "country",
         },
       }),
-      enabled: !!companyId,
-    })
-  );
+    enabled: companyIds.length > 0,
+  });
 
   // Fetch company-level climate scores for hazard analysis
-  const companyClimateQueries = companyIds.map((companyId) =>
-    useQuery({
-      ...getV3CompaniesCompanyIdClimateScoresOptions({
-        path: { company_id: companyId },
-        query: {
+  const {
+    data: companyClimateData,
+    isLoading: companyClimateLoading,
+    error: companyClimateError,
+  } = useQuery({
+    queryKey: [
+      "companyClimateScores",
+      companyIds,
+      horizon,
+      pathway,
+      risk,
+      metric,
+    ],
+    queryFn: () =>
+      getMultipleCompanyClimateScores({
+        data: {
+          company_ids: companyIds,
           horizon,
           pathway,
           risk,
           metric,
         },
       }),
-      enabled: !!companyId,
-    })
-  );
+    enabled: companyIds.length > 0,
+  });
 
   // Check if any queries are loading
-  const isLoading = sectorQueries.some((query) => query.isLoading) ||
-    geographyQueries.some((query) => query.isLoading) ||
-    companyClimateQueries.some((query) => query.isLoading);
+  const isLoading = sectorLoading || geographyLoading || companyClimateLoading;
 
   // Check if any queries have errors
-  const hasError = sectorQueries.some((query) => query.error) ||
-    geographyQueries.some((query) => query.error) ||
-    companyClimateQueries.some((query) => query.error);
+  const hasError = !!sectorError || !!geographyError || !!companyClimateError;
 
   // Aggregate data by sector with weighted risk contributions
-  const sectorData = useMemo(() => {
+  const sectorDataProcessed = useMemo(() => {
     const sectorMap = new Map<string, {
       sector: string;
       totalWeight: number;
@@ -174,7 +203,7 @@ export function PortfolioAggregationView({
     }>();
 
     // Process real API data for sectors
-    companies.forEach((company, index) => {
+    companies.forEach((company) => {
       const sector = company.sector || "Unknown";
       const existing = sectorMap.get(sector) || {
         sector,
@@ -187,8 +216,10 @@ export function PortfolioAggregationView({
       existing.totalWeight += company.weight;
       existing.companies += 1;
 
-      // Get real climate score from API data
-      const sectorQuery = sectorQueries[index];
+      // Get real climate score from API data - updated for new server function structure
+      const sectorQuery = sectorData?.find((query: any) =>
+        query.company_id === company.id && query.success
+      );
       if (sectorQuery?.data?.results) {
         // Extract the climate score from the API response
         const results = sectorQuery.data.results;
@@ -231,10 +262,10 @@ export function PortfolioAggregationView({
           : 0,
       }))
       .sort((a, b) => b.totalWeight - a.totalWeight);
-  }, [companies, sectorQueries]);
+  }, [companies, sectorData]);
 
   // Aggregate data by geography with weighted risk contributions
-  const geographyData = useMemo(() => {
+  const geographyDataProcessed = useMemo(() => {
     const geographyMap = new Map<string, {
       country: string;
       weight: number;
@@ -243,9 +274,11 @@ export function PortfolioAggregationView({
     }>();
 
     // Process real API data for geography
-    companies.forEach((company, index) => {
-      // Get geography data from API
-      const geographyQuery = geographyQueries[index];
+    companies.forEach((company) => {
+      // Get geography data from API - updated for new server function structure
+      const geographyQuery = geographyData?.find((query: any) =>
+        query.company_id === company.id && query.success
+      );
       if (geographyQuery?.data?.results) {
         // Process the aggregated geography data from API
         const geoData = geographyQuery.data.results;
@@ -335,10 +368,10 @@ export function PortfolioAggregationView({
           : 0,
       }))
       .sort((a, b) => b.weight - a.weight);
-  }, [companies, geographyQueries]);
+  }, [companies, geographyData]);
 
   // Aggregate data by hazard - using real API data
-  const hazardData = useMemo(() => {
+  const hazardDataProcessed = useMemo(() => {
     const hazardMap = new Map<string, {
       hazard: string;
       portfolioExposure: number;
@@ -349,8 +382,10 @@ export function PortfolioAggregationView({
     }>();
 
     // Process real API data for hazards
-    companies.forEach((company, index) => {
-      const companyClimateQuery = companyClimateQueries[index];
+    companies.forEach((company) => {
+      const companyClimateQuery = companyClimateData?.find((query: any) =>
+        query.company_id === company.id && query.success
+      );
       if (companyClimateQuery?.data) {
         // Extract hazard data from company climate scores
         const climateData = companyClimateQuery.data;
@@ -482,7 +517,7 @@ export function PortfolioAggregationView({
         avgRiskScore: hazard.avgRiskScore,
       }))
       .filter((hazard) => hazard.value > 0); // Only show hazards with actual weighted contribution
-  }, [companies, companyClimateQueries]);
+  }, [companies, companyClimateData]);
 
   // Time series data for horizon analysis with weighted risk contributions
   const horizonData = useMemo(() => {
@@ -499,8 +534,10 @@ export function PortfolioAggregationView({
       let totalImpact = 0;
       let companyCount = 0;
 
-      companies.forEach((company, index) => {
-        const companyClimateQuery = companyClimateQueries[index];
+      companies.forEach((company) => {
+        const companyClimateQuery = companyClimateData?.find((query: any) =>
+          query.company_id === company.id && query.success
+        );
         if (companyClimateQuery?.data) {
           const climateData = companyClimateQuery.data;
 
@@ -555,19 +592,19 @@ export function PortfolioAggregationView({
         ? (horizon.weight * horizon.score) / totalWeightedRisk
         : 0,
     }));
-  }, [companies, companyClimateQueries]);
+  }, [companies, companyClimateData]);
 
   // Portfolio summary metrics
   const portfolioMetrics = useMemo(() => {
     const totalWeight = companies.reduce((sum, c) => sum + c.weight, 0);
-    const avgScore = sectorData.reduce((sum, s) =>
+    const avgScore = sectorDataProcessed.reduce((sum, s) =>
       sum + s.avgScore * s.totalWeight, 0) / totalWeight;
 
     return {
       totalCompanies: companies.length,
       totalWeight: totalWeight.toFixed(1),
       avgRiskScore: (avgScore * 100).toFixed(1),
-      highRiskSectors: sectorData.filter((s) =>
+      highRiskSectors: sectorDataProcessed.filter((s) =>
         s.riskLevel === "high"
       ).length,
       diversification: companies.length > 10
@@ -576,7 +613,7 @@ export function PortfolioAggregationView({
         ? "Moderate"
         : "Low",
     };
-  }, [companies, sectorData]);
+  }, [companies, sectorDataProcessed]);
 
   const getRiskColor = (level: string) => {
     switch (level) {
@@ -832,7 +869,7 @@ export function PortfolioAggregationView({
                   }}
                   className="h-[300px]"
                 >
-                  <BarChart data={sectorData}>
+                  <BarChart data={sectorDataProcessed}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="sector"
@@ -877,7 +914,7 @@ export function PortfolioAggregationView({
               </CardHeader>
               <CardContent>
                 <ChartContainer
-                  config={sectorData.reduce((acc, item, index) => ({
+                  config={sectorDataProcessed.reduce((acc, item, index) => ({
                     ...acc,
                     [item.sector]: {
                       label: item.sector,
@@ -888,7 +925,7 @@ export function PortfolioAggregationView({
                 >
                   <PieChart>
                     <Pie
-                      data={sectorData}
+                      data={sectorDataProcessed}
                       dataKey="weightedContribution"
                       nameKey="sector"
                       cx="50%"
@@ -899,7 +936,7 @@ export function PortfolioAggregationView({
                           (weightedContribution * 100).toFixed(1)
                         }%`}
                     >
-                      {sectorData.map((_, index) => (
+                      {sectorDataProcessed.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={CHART_COLORS[index % CHART_COLORS.length]}
@@ -931,7 +968,7 @@ export function PortfolioAggregationView({
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {sectorData.map((sector, index) => (
+                {sectorDataProcessed.map((sector, index) => (
                   <div
                     key={sector.sector}
                     className="flex items-center justify-between p-3 border rounded-lg"
@@ -1005,7 +1042,7 @@ export function PortfolioAggregationView({
                   }}
                   className="h-[300px]"
                 >
-                  <BarChart data={geographyData}>
+                  <BarChart data={geographyDataProcessed}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="country"
@@ -1050,7 +1087,7 @@ export function PortfolioAggregationView({
               </CardHeader>
               <CardContent>
                 <ChartContainer
-                  config={geographyData.reduce((acc, item, index) => ({
+                  config={geographyDataProcessed.reduce((acc, item, index) => ({
                     ...acc,
                     [item.country]: {
                       label: item.country,
@@ -1061,7 +1098,7 @@ export function PortfolioAggregationView({
                 >
                   <PieChart>
                     <Pie
-                      data={geographyData}
+                      data={geographyDataProcessed}
                       dataKey="weightedContribution"
                       nameKey="country"
                       cx="50%"
@@ -1072,7 +1109,7 @@ export function PortfolioAggregationView({
                           (weightedContribution * 100).toFixed(1)
                         }%`}
                     >
-                      {geographyData.map((_, index) => (
+                      {geographyDataProcessed.map((_, index) => (
                         <Cell
                           key={`cell-${index}`}
                           fill={CHART_COLORS[index % CHART_COLORS.length]}
@@ -1108,7 +1145,7 @@ export function PortfolioAggregationView({
               </CardHeader>
               <CardContent>
                 <ChartContainer
-                  config={hazardData.reduce((acc, item) => ({
+                  config={hazardDataProcessed.reduce((acc, item) => ({
                     ...acc,
                     [item.hazard]: {
                       label: item.hazard,
@@ -1117,7 +1154,7 @@ export function PortfolioAggregationView({
                   }), {})}
                   className="h-[300px]"
                 >
-                  <BarChart data={hazardData}>
+                  <BarChart data={hazardDataProcessed}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis
                       dataKey="hazard"
@@ -1152,7 +1189,7 @@ export function PortfolioAggregationView({
               </CardHeader>
               <CardContent>
                 <ChartContainer
-                  config={hazardData.reduce((acc, item) => ({
+                  config={hazardDataProcessed.reduce((acc, item) => ({
                     ...acc,
                     [item.hazard]: {
                       label: item.hazard,
@@ -1163,7 +1200,7 @@ export function PortfolioAggregationView({
                 >
                   <PieChart>
                     <Pie
-                      data={hazardData}
+                      data={hazardDataProcessed}
                       dataKey="value"
                       nameKey="hazard"
                       cx="50%"
@@ -1172,7 +1209,7 @@ export function PortfolioAggregationView({
                       label={({ hazard, value }) =>
                         `${hazard}: ${(value * 100).toFixed(1)}%`}
                     >
-                      {hazardData.map((entry, index) => (
+                      {hazardDataProcessed.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
@@ -1202,7 +1239,7 @@ export function PortfolioAggregationView({
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {hazardData.map((hazard) => (
+                {hazardDataProcessed.map((hazard) => (
                   <div
                     key={hazard.hazard}
                     className="flex items-center justify-between p-3 border rounded-lg"

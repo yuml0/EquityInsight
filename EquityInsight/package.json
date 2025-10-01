@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev --port 12306",
+    "dev": "vite dev",
     "start": "node .output/server/index.mjs",
     "build": "vite build",
     "serve": "vite preview",

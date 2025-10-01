@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getV3CompanySearchOptions } from "../client/@tanstack/react-query.gen";
 import type { Company } from "../client/types.gen";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
@@ -8,11 +7,41 @@ import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 import { Building2, Check, Loader2, Plus, Search } from "lucide-react";
 import { cn } from "../lib/utils";
+import { createServerFn } from "@tanstack/react-start";
+import { getV3CompanySearch } from "@/client/sdk.gen";
+import { z } from "zod";
 
 interface CompanySearchProps {
   onAddCompany: (company: Company) => void;
   selectedCompanyIds: Set<string>;
 }
+
+export const searchCompanies = createServerFn({
+  method: "GET",
+}).inputValidator(z.object({
+  query: z.string().optional(),
+  limit: z.number().optional(),
+  isin_code: z.string().optional(),
+  sector: z.string().optional(),
+  stock_ticker: z.string().optional(),
+  method: z.enum(["fuzzy", "strict"]).optional(),
+})).handler(
+  async (
+    { data },
+  ) => {
+    const result = await getV3CompanySearch({
+      query: {
+        name: data.query,
+        limit: data.limit || 20,
+        isin_code: data.isin_code || undefined,
+        sector: data.sector || undefined,
+        stock_ticker: data.stock_ticker || undefined,
+        method: data.method || "fuzzy",
+      },
+    });
+    return result.data || { results: [] };
+  },
+);
 
 export function CompanySearch({
   onAddCompany,
@@ -20,7 +49,7 @@ export function CompanySearch({
 }: CompanySearchProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState<
-    "name" | "stock_ticker" | "isin_code"
+    "name" | "stock_ticker" | "isin_code" | "sector"
   >("name");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [allCompanies, setAllCompanies] = useState<Company[]>([]);
@@ -43,25 +72,37 @@ export function CompanySearch({
     data,
     isLoading,
     error,
-  } = useQuery({
-    ...getV3CompanySearchOptions({
-      query: {
-        limit: 20,
-        ...(searchType === "name" && { name: debouncedSearchTerm }),
-        ...(searchType === "stock_ticker" &&
-          { stock_ticker: debouncedSearchTerm }),
-        ...(searchType === "isin_code" && { isin_code: debouncedSearchTerm }),
-        method: "fuzzy",
-      },
-    }),
-    enabled: debouncedSearchTerm.length >= 2,
-  });
+  } = useQuery(
+    {
+      queryKey: ["searchCompanies", debouncedSearchTerm, searchType],
+      queryFn: () =>
+        searchCompanies({
+          data: {
+            query: searchType === "name" ? debouncedSearchTerm : undefined,
+            limit: 20,
+            isin_code: searchType === "isin_code"
+              ? debouncedSearchTerm
+              : undefined,
+            sector: searchType === "sector" ? debouncedSearchTerm : undefined,
+            stock_ticker: searchType === "stock_ticker"
+              ? debouncedSearchTerm
+              : undefined,
+            method: "fuzzy",
+          },
+        }),
+      enabled: debouncedSearchTerm.length >= 2,
+    },
+  );
 
   // Update allCompanies when data changes
   useEffect(() => {
     if (data?.results) {
       setAllCompanies(data.results);
       setHasMore(data.results.length === 20); // Assume more if we got full page
+    } else if (data && !data.results) {
+      // Handle case where API returns data but no results array
+      setAllCompanies([]);
+      setHasMore(false);
     }
   }, [data]);
 
@@ -122,13 +163,18 @@ export function CompanySearch({
           value={searchType}
           onChange={(e) =>
             setSearchType(
-              e.target.value as "name" | "stock_ticker" | "isin_code",
+              e.target.value as
+                | "name"
+                | "stock_ticker"
+                | "isin_code"
+                | "sector",
             )}
           className="px-3 py-2 border border-input rounded-md bg-background"
         >
           <option value="name">Name</option>
           <option value="stock_ticker">Stock Ticker</option>
           <option value="isin_code">ISIN Code</option>
+          <option value="sector">Sector</option>
         </select>
       </div>
 
@@ -137,10 +183,9 @@ export function CompanySearch({
         {isLoading && debouncedSearchTerm && (
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto">
-              </div>
+              <Loader2 className="h-8 w-8 animate-spin mx-auto text-blue-600" />
               <p className="text-sm text-muted-foreground mt-2">
-                Searching companies...
+                Searching companies by {searchType.replace("_", " ")}...
               </p>
             </div>
           </div>
@@ -160,7 +205,8 @@ export function CompanySearch({
               <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
               <p>No companies found for "{debouncedSearchTerm}"</p>
               <p className="text-sm">
-                Try a different search term or search type
+                Try a different search term or change the search type to{" "}
+                {searchType.replace("_", " ")}
               </p>
             </div>
           </div>
@@ -258,7 +304,8 @@ export function CompanySearch({
               <Building2 className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
               <p>Search for companies to add to your portfolio</p>
               <p className="text-sm">
-                Enter at least 2 characters to start searching
+                Enter at least 2 characters to start searching by{" "}
+                {searchType.replace("_", " ")}
               </p>
             </div>
           </div>

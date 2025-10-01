@@ -1,9 +1,9 @@
-import { useQueries } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import {
-  getV3CompaniesCompanyIdAssetsClimateScoresAggregationOptions,
-  getV3CompaniesCompanyIdClimateScoresOptions,
-} from "../../client/@tanstack/react-query.gen";
+  getMultipleCompanyClimateScoresAggregation,
+  getMultipleCompanyClimateScores,
+} from "../../lib/server-functions";
 import type { PortfolioCompany } from "../PortfolioManager";
 import type { SectorData, GeographyData, HazardData, HorizonData, TopNDriversData, TopNCompanyDriver, TopNHazardDriver, ConcentrationMetrics } from "./types";
 
@@ -115,30 +115,30 @@ export function useSectorQueries(
     [companies]
   );
 
-  const sectorQueries = useQueries({
-    queries: companyIds.map((companyId) => {
-      const queryParams = {
-        horizon,
-        pathway,
-        risk,
-        metric,
-        by: "asset_type" as const,
-      };
-      console.log("Sector query params:", queryParams);
-      return {
-        ...getV3CompaniesCompanyIdAssetsClimateScoresAggregationOptions({
-          path: { company_id: companyId },
-          query: queryParams,
-        }),
-        enabled: !!companyId,
-      };
-    }),
+  const {
+    data: sectorData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["sectorClimateScores", companyIds, horizon, pathway, risk, metric],
+    queryFn: () =>
+      getMultipleCompanyClimateScoresAggregation({
+        data: {
+          company_ids: companyIds,
+          horizon,
+          pathway,
+          risk,
+          metric,
+          by: "asset_type",
+        },
+      }),
+    enabled: companyIds.length > 0,
   });
 
   return {
-    sectorQueries,
-    isLoading: sectorQueries.some((query) => query.isLoading),
-    hasError: sectorQueries.some((query) => query.error),
+    sectorQueries: sectorData || [],
+    isLoading,
+    hasError: !!error,
   };
 }
 
@@ -154,26 +154,30 @@ export function useGeographyQueries(
     [companies]
   );
 
-  const geographyQueries = useQueries({
-    queries: companyIds.map((companyId) => ({
-      ...getV3CompaniesCompanyIdAssetsClimateScoresAggregationOptions({
-        path: { company_id: companyId },
-        query: {
+  const {
+    data: geographyData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["geographyClimateScores", companyIds, horizon, pathway, risk, metric],
+    queryFn: () =>
+      getMultipleCompanyClimateScoresAggregation({
+        data: {
+          company_ids: companyIds,
           horizon,
           pathway,
           risk,
           metric,
-          by: "country" as const,
+          by: "country",
         },
       }),
-      enabled: !!companyId,
-    })),
+    enabled: companyIds.length > 0,
   });
 
   return {
-    geographyQueries,
-    isLoading: geographyQueries.some((query) => query.isLoading),
-    hasError: geographyQueries.some((query) => query.error),
+    geographyQueries: geographyData || [],
+    isLoading,
+    hasError: !!error,
   };
 }
 
@@ -189,25 +193,29 @@ export function useHazardQueries(
     [companies]
   );
 
-  const companyClimateQueries = useQueries({
-    queries: companyIds.map((companyId) => ({
-      ...getV3CompaniesCompanyIdClimateScoresOptions({
-        path: { company_id: companyId },
-        query: {
+  const {
+    data: hazardData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["hazardClimateScores", companyIds, horizon, pathway, risk, metric],
+    queryFn: () =>
+      getMultipleCompanyClimateScores({
+        data: {
+          company_ids: companyIds,
           horizon,
           pathway,
           risk,
           metric,
         },
       }),
-      enabled: !!companyId,
-    })),
+    enabled: companyIds.length > 0,
   });
 
   return {
-    companyClimateQueries,
-    isLoading: companyClimateQueries.some((query) => query.isLoading),
-    hasError: companyClimateQueries.some((query) => query.error),
+    companyClimateQueries: hazardData || [],
+    isLoading,
+    hasError: !!error,
   };
 }
 
@@ -223,25 +231,29 @@ export function useHorizonQueries(
     [companies]
   );
 
-  const companyClimateQueries = useQueries({
-    queries: companyIds.map((companyId) => ({
-      ...getV3CompaniesCompanyIdClimateScoresOptions({
-        path: { company_id: companyId },
-        query: {
+  const {
+    data: horizonData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["horizonClimateScores", companyIds, horizon, pathway, risk, metric],
+    queryFn: () =>
+      getMultipleCompanyClimateScores({
+        data: {
+          company_ids: companyIds,
           horizon,
           pathway,
           risk,
           metric,
         },
       }),
-      enabled: !!companyId,
-    })),
+    enabled: companyIds.length > 0,
   });
 
   return {
-    companyClimateQueries,
-    isLoading: companyClimateQueries.some((query) => query.isLoading),
-    hasError: companyClimateQueries.some((query) => query.error),
+    companyClimateQueries: horizonData || [],
+    isLoading,
+    hasError: !!error,
   };
 }
 
@@ -258,7 +270,7 @@ export function useSectorData(
       riskLevel: "low" | "medium" | "high";
     }>();
 
-    companies.forEach((company, index) => {
+    companies.forEach((company) => {
       const sector = company.sector || "Unknown";
       const existing = sectorMap.get(sector) || {
         sector,
@@ -271,8 +283,10 @@ export function useSectorData(
       existing.totalWeight += company.weight;
       existing.companies += 1;
 
-      // Get real climate score from API data
-      const sectorQuery = sectorQueries[index];
+      // Get real climate score from API data - updated for new server function structure
+      const sectorQuery = sectorQueries.find((query: any) =>
+        query.company_id === company.id && query.success
+      );
       if (sectorQuery?.data?.results) {
         const results = sectorQuery.data.results;
         if (Array.isArray(results) && results.length > 0) {
@@ -326,8 +340,10 @@ export function useGeographyData(
       riskLevel: "low" | "medium" | "high";
     }>();
 
-    companies.forEach((company, index) => {
-      const geographyQuery = geographyQueries[index];
+    companies.forEach((company) => {
+      const geographyQuery = geographyQueries.find((query: any) =>
+        query.company_id === company.id && query.success
+      );
       if (geographyQuery?.data?.results) {
         const geoData = geographyQuery.data.results;
         if (Array.isArray(geoData)) {
@@ -400,8 +416,10 @@ export function useHazardData(
       companies: number;
     }>();
 
-    companies.forEach((company, index) => {
-      const companyClimateQuery = companyClimateQueries[index];
+    companies.forEach((company) => {
+      const companyClimateQuery = companyClimateQueries.find((query: any) =>
+        query.company_id === company.id && query.success
+      );
       if (companyClimateQuery?.data) {
         const climateData = companyClimateQuery.data;
 

@@ -9,7 +9,7 @@ import { client } from "./client/client.gen";
 client.setConfig({
   headers: {
     "Content-Type": "application/json",
-    "Authorization": `Bearer zbLnoZJaplE1jbyXQzF2XZVE2fY7aJYg`,
+    "Authorization": `Bearer ${import.meta.env.VITE_RISKTHINKING_API_KEY}`,
   },
 });
 

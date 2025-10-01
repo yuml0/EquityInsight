@@ -213,25 +213,6 @@ Required environment variables:
 - `GOOGLE_GENERATIVE_AI_API_KEY`: Your Google Generative AI API key for the AI
   assistant
 
-### API Configuration
-
-The application connects to the RiskThinking.ai API through a Vite proxy
-configuration:
-
-```typescript
-// vite.config.ts
-server: {
-  proxy: {
-    '/api': {
-      target: 'https://api.riskthinking.ai',
-      changeOrigin: true,
-      secure: true,
-      rewrite: (path) => path.replace(/^\/api/, ''),
-    },
-  },
-}
-```
-
 ## 🎯 Usage Guide
 
 ### Building a Portfolio
@@ -312,14 +293,6 @@ Built with a comprehensive design system using:
 - The `.env` file is gitignored to prevent accidental commits
 - All data is processed client-side with localStorage persistence
 - No sensitive data is stored on external servers
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting: `pnpm check`
-5. Submit a pull request
 
 ## 📄 License
 

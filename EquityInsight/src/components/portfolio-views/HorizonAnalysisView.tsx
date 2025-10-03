@@ -95,24 +95,24 @@ export function HorizonAnalysisView({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
+    <div className="h-full flex flex-col space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full max-w-full">
+        <Card className="flex flex-col">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Risk Evolution Over Time</CardTitle>
             <CardDescription>
               How climate risk is projected to change across different time
               horizons (2025-2100)
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             <ChartContainer
               config={{
                 horizon: { label: "Time Horizon" },
                 score: { label: "Risk Score", color: "#8884d8" },
                 impact: { label: "Expected Impact", color: "#82ca9d" },
               }}
-              className="h-[300px]"
+              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
             >
               <LineChart data={horizonData}>
                 <CartesianGrid strokeDasharray="3 3" />
@@ -161,15 +161,15 @@ export function HorizonAnalysisView({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="flex flex-col">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Risk Contribution by Horizon</CardTitle>
             <CardDescription>
               Weighted climate risk contribution by time horizon (weight × risk
               score)
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             <ChartContainer
               config={horizonData.reduce((acc, item, index) => ({
                 ...acc,
@@ -178,7 +178,7 @@ export function HorizonAnalysisView({
                   color: CHART_COLORS[index % CHART_COLORS.length],
                 },
               }), {})}
-              className="h-[300px]"
+              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
             >
               <PieChart>
                 <Pie
@@ -214,7 +214,7 @@ export function HorizonAnalysisView({
         </Card>
       </div>
 
-      <Card>
+      <Card className="flex-shrink-0">
         <CardHeader>
           <CardTitle>Time Horizon Breakdown</CardTitle>
           <CardDescription>
@@ -222,7 +222,7 @@ export function HorizonAnalysisView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-96 overflow-y-auto">
             {horizonData.map((horizon) => (
               <div
                 key={horizon.horizon}

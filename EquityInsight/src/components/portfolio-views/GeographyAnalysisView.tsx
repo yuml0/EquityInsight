@@ -80,17 +80,17 @@ export function GeographyAnalysisView({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
+    <div className="h-full flex flex-col space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full max-w-full">
+        <Card className="flex flex-col">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Risk Contribution by Geography</CardTitle>
             <CardDescription>
               Weighted climate risk contribution by geography (weight × risk
               score)
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             <ChartContainer
               config={geographyData.reduce((acc, item, index) => ({
                 ...acc,
@@ -99,7 +99,7 @@ export function GeographyAnalysisView({
                   color: CHART_COLORS[index % CHART_COLORS.length],
                 },
               }), {})}
-              className="h-[300px]"
+              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
             >
               <PieChart>
                 <Pie
@@ -134,14 +134,14 @@ export function GeographyAnalysisView({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="flex flex-col">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Geographic Risk Distribution</CardTitle>
             <CardDescription>
               Portfolio weight distribution by geography
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             <ChartContainer
               config={geographyData.reduce((acc, item, index) => ({
                 ...acc,
@@ -150,7 +150,7 @@ export function GeographyAnalysisView({
                   color: CHART_COLORS[index % CHART_COLORS.length],
                 },
               }), {})}
-              className="h-[300px]"
+              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
             >
               <BarChart data={geographyData}>
                 <XAxis
@@ -182,7 +182,7 @@ export function GeographyAnalysisView({
         </Card>
       </div>
 
-      <Card>
+      <Card className="flex-shrink-0">
         <CardHeader>
           <CardTitle>Geographic Breakdown</CardTitle>
           <CardDescription>
@@ -190,7 +190,7 @@ export function GeographyAnalysisView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-96 overflow-y-auto">
             {geographyData.map((geo) => (
               <div
                 key={geo.country}

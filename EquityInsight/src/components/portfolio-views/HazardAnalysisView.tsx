@@ -69,17 +69,17 @@ export function HazardAnalysisView({
   }
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
+    <div className="h-full flex flex-col space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full max-w-full">
+        <Card className="flex flex-col">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Weighted Risk Contribution</CardTitle>
             <CardDescription>
               Proportional climate hazard risk contribution to total portfolio
               risk
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             <ChartContainer
               config={hazardData.reduce((acc, item) => ({
                 ...acc,
@@ -88,7 +88,7 @@ export function HazardAnalysisView({
                   color: item.color,
                 },
               }), {})}
-              className="h-[300px]"
+              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
             >
               <PieChart>
                 <Pie
@@ -120,14 +120,14 @@ export function HazardAnalysisView({
           </CardContent>
         </Card>
 
-        <Card>
-          <CardHeader>
+        <Card className="flex flex-col">
+          <CardHeader className="flex-shrink-0">
             <CardTitle>Hazard Exposure by Portfolio</CardTitle>
             <CardDescription>
               Portfolio exposure to different climate hazards
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex-1 min-h-0">
             <ChartContainer
               config={hazardData.reduce((acc, item) => ({
                 ...acc,
@@ -136,7 +136,7 @@ export function HazardAnalysisView({
                   color: item.color,
                 },
               }), {})}
-              className="h-[300px]"
+              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
             >
               <BarChart data={hazardData}>
                 <XAxis
@@ -173,7 +173,7 @@ export function HazardAnalysisView({
         </Card>
       </div>
 
-      <Card>
+      <Card className="flex-shrink-0">
         <CardHeader>
           <CardTitle>Hazard Exposure Details</CardTitle>
           <CardDescription>
@@ -181,7 +181,7 @@ export function HazardAnalysisView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-96 overflow-y-auto">
             {hazardData.map((hazard) => (
               <div
                 key={hazard.hazard}

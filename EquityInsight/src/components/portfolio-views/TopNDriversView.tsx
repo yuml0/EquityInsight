@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -26,25 +26,12 @@ import {
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
-import {
   AlertTriangle,
   ArrowUpDown,
   BarChart3,
   Building2,
   Settings,
   Shield,
-  Target,
   TrendingUp,
 } from "lucide-react";
 import { useHazardQueries, useTopNDriversData } from "./hooks";
@@ -365,28 +352,6 @@ export function TopNDriversView({
     setSelectedAction(null);
   };
 
-  // Chart data for company contributions
-  const companyChartData = useMemo(() => {
-    return topNDriversData.companies.slice(0, 10).map((company) => ({
-      name: company.companyName.length > 15
-        ? company.companyName.substring(0, 15) + "..."
-        : company.companyName,
-      contribution: company.contributionPercent,
-      cvar: company.cvar,
-      weight: company.weight,
-      sector: company.sector,
-    }));
-  }, [topNDriversData.companies]);
-
-  // Chart data for hazard contributions
-  const hazardChartData = useMemo(() => {
-    return topNDriversData.hazards.map((hazard) => ({
-      name: hazard.hazard,
-      value: hazard.contributionPercent,
-      color: hazard.color,
-    }));
-  }, [topNDriversData.hazards]);
-
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -427,36 +392,28 @@ export function TopNDriversView({
   }
 
   return (
-    <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Portfolio Risk
-            </CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {topNDriversData.totalPortfolioRisk.toFixed(3)}
+    <div className="h-full flex flex-col space-y-4 pr-3">
+      {/* Compact Summary Row */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 flex-shrink-0">
+        <Card className="p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Portfolio Risk</p>
+              <p className="text-lg font-bold">
+                {topNDriversData.totalPortfolioRisk.toFixed(3)}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Weighted CVaR contribution
-            </p>
-          </CardContent>
+            <BarChart3 className="h-4 w-4 text-muted-foreground" />
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Concentration (HHI)
-            </CardTitle>
-            <Target className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {topNDriversData.concentration.hhi.toFixed(3)}
+        <Card className="p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Concentration</p>
+              <p className="text-lg font-bold">
+                {topNDriversData.concentration.hhi.toFixed(3)}
+              </p>
             </div>
             <Badge
               variant={topNDriversData.concentration.concentrationLevel ===
@@ -470,267 +427,192 @@ export function TopNDriversView({
             >
               {topNDriversData.concentration.concentrationLevel}
             </Badge>
-          </CardContent>
+          </div>
         </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Top Driver Share
-            </CardTitle>
+        <Card className="p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Top Driver</p>
+              <p className="text-lg font-bold">
+                {topNDriversData.companies[0]?.contributionPercent.toFixed(1) ||
+                  0}%
+              </p>
+            </div>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {topNDriversData.companies[0]?.contributionPercent.toFixed(1) ||
-                0}%
+          </div>
+        </Card>
+
+        <Card className="p-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-xs text-muted-foreground">Companies</p>
+              <p className="text-lg font-bold">
+                {topNDriversData.companies.length}
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground">
-              {topNDriversData.companies[0]?.companyName || "N/A"}
-            </p>
-          </CardContent>
+            <Building2 className="h-4 w-4 text-muted-foreground" />
+          </div>
         </Card>
       </div>
 
-      {/* Company Drivers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Building2 className="h-5 w-5" />
-              Top-N Company Drivers
-            </CardTitle>
-            <CardDescription>
-              Companies ranked by risk contribution (w_i × CVaR_i)
-              <br />
-              <span className="text-xs text-muted-foreground">
-                Based on real climate risk scores from the API
-              </span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Company Chart */}
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={companyChartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis
-                      dataKey="name"
-                      angle={-45}
-                      textAnchor="end"
-                      height={80}
-                      fontSize={12}
-                    />
-                    <YAxis />
-                    <Tooltip
-                      formatter={(value: number, name: string) => [
-                        `${value.toFixed(1)}%`,
-                        name === "contribution" ? "Risk Contribution" : name,
-                      ]}
-                      labelFormatter={(label) => `Company: ${label}`}
-                    />
-                    <Bar dataKey="contribution" fill="#8884d8" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Company Table */}
-              <div className="border rounded-lg">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-12">Rank</TableHead>
-                      <TableHead>Company</TableHead>
-                      <TableHead className="text-right">Weight</TableHead>
-                      <TableHead className="text-right">CVaR</TableHead>
-                      <TableHead className="text-right">Contribution</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {topNDriversData.companies.slice(0, 10).map((company) => (
-                      <TableRow key={company.companyId}>
-                        <TableCell className="font-medium">
-                          #{company.rank}
-                        </TableCell>
-                        <TableCell>
-                          <div>
-                            <div className="font-medium">
-                              {company.companyName}
-                            </div>
-                            <Badge variant="outline" className="text-xs">
-                              {company.sector}
-                            </Badge>
-                          </div>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {company.weight.toFixed(1)}%
-                        </TableCell>
-                        <TableCell className="text-right">
-                          {company.cvar.toFixed(3)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <div className="w-16">
-                              <Progress
-                                value={company.contributionPercent}
-                                className="h-2"
-                              />
-                            </div>
-                            <span className="text-sm font-medium w-12">
-                              {company.contributionPercent.toFixed(1)}%
-                            </span>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Hazard Drivers */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5" />
-              Top-N Hazard Drivers
-            </CardTitle>
-            <CardDescription>
-              Hazards ranked by portfolio risk contribution
-              <br />
-              <span className="text-xs text-muted-foreground">
-                Note: Hazard breakdowns are estimated based on sector risk
-                patterns and real company climate scores
-              </span>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {/* Hazard Pie Chart */}
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={hazardChartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {hazardChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      formatter={(
-                        value: number,
-                      ) => [`${value.toFixed(1)}%`, "Risk Contribution"]}
-                    />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-
-              {/* Hazard Table */}
-              <div className="space-y-2">
-                {topNDriversData.hazards.map((hazard) => (
-                  <div
-                    key={hazard.hazard}
-                    className="flex items-center justify-between p-3 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-4 h-4 rounded-full"
-                        style={{ backgroundColor: hazard.color }}
-                      />
-                      <div>
-                        <div className="font-medium">{hazard.hazard}</div>
-                        <div className="text-sm text-muted-foreground">
-                          Rank #{hazard.rank}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-medium">
-                        {hazard.contributionPercent.toFixed(1)}%
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        {hazard.totalContribution.toFixed(3)}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Concentration Analysis */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-5 w-5" />
-            Concentration Analysis
+      {/* Company Drivers - Compact Table */}
+      <Card className="flex flex-col">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Building2 className="h-4 w-4" />
+            Top Company Drivers
           </CardTitle>
-          <CardDescription>
-            Portfolio risk concentration and diversification insights
+          <CardDescription className="text-sm">
+            Risk contribution ranking (w_i × CVaR_i)
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-lg font-semibold">
-                  Herfindahl-Hirschman Index (HHI):{" "}
-                  {topNDriversData.concentration.hhi.toFixed(3)}
+        <CardContent className="flex-1 min-h-0 p-0">
+          <Table>
+            <TableHeader className="sticky top-0 bg-background">
+              <TableRow>
+                <TableHead className="w-12 text-xs">#</TableHead>
+                <TableHead className="text-xs">Company</TableHead>
+                <TableHead className="text-right text-xs w-16">
+                  Weight
+                </TableHead>
+                <TableHead className="text-right text-xs w-16">
+                  CVaR
+                </TableHead>
+                <TableHead className="text-right text-xs w-20">
+                  Contribution
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {topNDriversData.companies.slice(0, 8).map((company) => (
+                <TableRow
+                  key={company.companyId}
+                  className="hover:bg-muted/50"
+                >
+                  <TableCell className="font-medium text-sm">
+                    {company.rank}
+                  </TableCell>
+                  <TableCell className="py-2">
+                    <div>
+                      <div className="font-medium text-sm truncate max-w-[120px]">
+                        {company.companyName}
+                      </div>
+                      <Badge variant="outline" className="text-xs mt-1">
+                        {company.sector}
+                      </Badge>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-right text-sm">
+                    {company.weight.toFixed(1)}%
+                  </TableCell>
+                  <TableCell className="text-right text-sm">
+                    {company.cvar.toFixed(2)}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-2">
+                      <div className="w-12">
+                        <Progress
+                          value={company.contributionPercent}
+                          className="h-1.5"
+                        />
+                      </div>
+                      <span className="text-xs font-medium w-10">
+                        {company.contributionPercent.toFixed(1)}%
+                      </span>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      {/* Hazard Drivers - Compact List */}
+      <Card className="flex flex-col">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <Shield className="h-4 w-4" />
+            Top Hazard Drivers
+          </CardTitle>
+          <CardDescription className="text-sm">
+            Climate hazards by risk contribution
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex-1 min-h-0 p-0">
+          <div className="space-y-2 p-2">
+            {topNDriversData.hazards.map((hazard) => (
+              <div
+                key={hazard.hazard}
+                className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50"
+              >
+                <div className="flex items-center gap-3">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: hazard.color }}
+                  />
+                  <div>
+                    <div className="font-medium text-sm">
+                      {hazard.hazard}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      Rank #{hazard.rank}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {topNDriversData.concentration.interpretation}
+                <div className="text-right">
+                  <div className="font-medium text-sm">
+                    {hazard.contributionPercent.toFixed(1)}%
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {hazard.totalContribution.toFixed(2)}
+                  </div>
                 </div>
               </div>
-              <Badge
-                variant={topNDriversData.concentration.concentrationLevel ===
-                    "high"
-                  ? "destructive"
-                  : topNDriversData.concentration.concentrationLevel ===
-                      "moderate"
-                  ? "secondary"
-                  : "default"}
-                className="text-sm px-3 py-1"
-              >
-                {topNDriversData.concentration.concentrationLevel.toUpperCase()}
-              </Badge>
-            </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-            {/* Actionable Insights */}
-            <div className="bg-muted p-4 rounded-lg">
-              <h4 className="font-semibold mb-2">Actionable Insights:</h4>
-              <ul className="space-y-2 text-sm">
-                {generateActionableInsights(topNDriversData).map((
-                  insight,
-                  index,
-                ) => (
-                  <li key={index} className="flex items-center justify-between">
-                    <span>• {insight.text}</span>
-                    {insight.action && onUpdateWeight && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleActionClick(insight.action!)}
-                        className="ml-2 h-6 px-2 text-xs"
-                      >
-                        <Settings className="h-3 w-3 mr-1" />
-                        Apply
-                      </Button>
-                    )}
-                  </li>
-                ))}
-              </ul>
+      {/* Compact Insights & Actions */}
+      <Card className="flex-shrink-0">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-base">
+            <AlertTriangle className="h-4 w-4" />
+            Risk Insights & Actions
+          </CardTitle>
+          <CardDescription className="text-sm">
+            HHI: {topNDriversData.concentration.hhi.toFixed(3)} •{" "}
+            {topNDriversData.concentration.interpretation}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-0">
+          <div className="space-y-3">
+            {/* Actionable Insights - Compact */}
+            <div className="space-y-2">
+              {generateActionableInsights(topNDriversData).slice(0, 4).map((
+                insight,
+                index,
+              ) => (
+                <div
+                  key={index}
+                  className="flex items-center justify-between p-2 border rounded-lg hover:bg-muted/50"
+                >
+                  <span className="text-sm flex-1">• {insight.text}</span>
+                  {insight.action && onUpdateWeight && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleActionClick(insight.action!)}
+                      className="ml-2 h-6 px-2 text-xs"
+                    >
+                      <Settings className="h-3 w-3 mr-1" />
+                      Apply
+                    </Button>
+                  )}
+                </div>
+              ))}
             </div>
 
             {/* Action Confirmation Dialog */}

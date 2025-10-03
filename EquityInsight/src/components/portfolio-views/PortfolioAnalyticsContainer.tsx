@@ -189,82 +189,83 @@ export function PortfolioAnalyticsContainer({
   ]);
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
-      {/* Portfolio Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-shrink-0">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Companies
-            </CardTitle>
-            <Building2 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {portfolioMetrics.totalCompanies}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Portfolio companies
-            </p>
-          </CardContent>
-        </Card>
+    <div className="h-full flex flex-col lg:flex-row gap-6">
+      {/* Left Panel - Summary and Filters */}
+      <div className="lg:w-1/3 space-y-6 flex flex-col">
+        {/* Portfolio Summary */}
+        <div className="grid grid-cols-2 gap-4 flex-shrink-0">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Companies
+              </CardTitle>
+              <Building2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {portfolioMetrics.totalCompanies}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Portfolio companies
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Total Weight
-            </CardTitle>
-            <BarChart3 className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {portfolioMetrics.totalWeight.toFixed(1)}%
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Portfolio allocation
-            </p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Weight
+              </CardTitle>
+              <BarChart3 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {portfolioMetrics.totalWeight.toFixed(1)}%
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Portfolio allocation
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Average Risk Score
-            </CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {(portfolioMetrics.avgScore * 100).toFixed(1)}%
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Climate risk level
-            </p>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Average Risk Score
+              </CardTitle>
+              <Activity className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {(portfolioMetrics.avgScore * 100).toFixed(1)}%
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Climate risk level
+              </p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              High Risk Companies
-            </CardTitle>
-            <AlertTriangle className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {portfolioMetrics.highRiskCompanies}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Require attention
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                High Risk Companies
+              </CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {portfolioMetrics.highRiskCompanies}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Require attention
+              </p>
+            </CardContent>
+          </Card>
+        </div>
 
-      {/* Filter Controls */}
-      <Card className="flex-shrink-0">
-        <CardHeader>
-          <div className="flex items-center justify-between">
+        {/* Filter Controls */}
+        <Card className="flex-1">
+          <CardHeader>
             <div>
               <CardTitle>Analysis Filters</CardTitle>
               <CardDescription>
@@ -272,177 +273,183 @@ export function PortfolioAnalyticsContainer({
                 risk metrics
               </CardDescription>
             </div>
-            <HTMLReportGenerator {...reportData} />
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Time Horizon</label>
-              <Select
-                value={horizon.toString()}
-                onValueChange={(value) => setHorizon(Number(value))}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {HORIZONS.map((h) => (
-                    <SelectItem key={h.value} value={h.value.toString()}>
-                      {h.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Time Horizon</label>
+                <Select
+                  value={horizon.toString()}
+                  onValueChange={(value) => setHorizon(Number(value))}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {HORIZONS.map((h) => (
+                      <SelectItem key={h.value} value={h.value.toString()}>
+                        {h.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Climate Pathway</label>
+                <Select value={pathway} onValueChange={setPathway}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PATHWAYS.map((p) => (
+                      <SelectItem key={p.value} value={p.value}>
+                        {p.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Risk Type</label>
+                <Select
+                  value={risk}
+                  onValueChange={(value: "physical" | "transition") =>
+                    setRisk(value)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RISK_TYPES.map((r) => (
+                      <SelectItem key={r.value} value={r.value}>
+                        {r.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Metric</label>
+                <Select value={metric} onValueChange={setMetric}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {METRICS.map((m) => (
+                      <SelectItem key={m.value} value={m.value}>
+                        {m.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Export Button */}
+              <div className="pt-4 border-t">
+                <HTMLReportGenerator {...reportData} />
+              </div>
             </div>
+          </CardContent>
+        </Card>
+      </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Climate Pathway</label>
-              <Select value={pathway} onValueChange={setPathway}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {PATHWAYS.map((p) => (
-                    <SelectItem key={p.value} value={p.value}>
-                      {p.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      {/* Right Panel - Analysis Views */}
+      <div className="lg:w-2/3 flex flex-col min-h-0">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="flex-1 flex flex-col min-h-0"
+        >
+          <TabsList className="grid w-full grid-cols-5 flex-shrink-0">
+            <TabsTrigger value="sector" className="flex items-center gap-2">
+              <Building2 className="h-4 w-4" />
+              Sector
+            </TabsTrigger>
+            <TabsTrigger value="geography" className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              Geography
+            </TabsTrigger>
+            <TabsTrigger value="hazard" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Hazard
+            </TabsTrigger>
+            <TabsTrigger value="horizon" className="flex items-center gap-2">
+              <Calendar className="h-4 w-4" />
+              Horizon
+            </TabsTrigger>
+            <TabsTrigger value="drivers" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Top-N Drivers
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="sector" className="flex-1 min-h-0">
+            <div className="h-full overflow-auto">
+              <SectorAnalysisView
+                companies={companies}
+                horizon={horizon}
+                pathway={pathway}
+                risk={risk}
+                metric={metric}
+              />
             </div>
+          </TabsContent>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Risk Type</label>
-              <Select
-                value={risk}
-                onValueChange={(value: "physical" | "transition") =>
-                  setRisk(value)}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {RISK_TYPES.map((r) => (
-                    <SelectItem key={r.value} value={r.value}>
-                      {r.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <TabsContent value="geography" className="flex-1 min-h-0">
+            <div className="h-full overflow-auto">
+              <GeographyAnalysisView
+                companies={companies}
+                horizon={horizon}
+                pathway={pathway}
+                risk={risk}
+                metric={metric}
+              />
             </div>
+          </TabsContent>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Metric</label>
-              <Select value={metric} onValueChange={setMetric}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {METRICS.map((m) => (
-                    <SelectItem key={m.value} value={m.value}>
-                      {m.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <TabsContent value="hazard" className="flex-1 min-h-0">
+            <div className="h-full overflow-auto">
+              <HazardAnalysisView
+                companies={companies}
+                horizon={horizon}
+                pathway={pathway}
+                risk={risk}
+                metric={metric}
+              />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </TabsContent>
 
-      {/* Analysis Views */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="flex-1 flex flex-col min-h-0"
-      >
-        <TabsList className="grid w-full grid-cols-5 flex-shrink-0">
-          <TabsTrigger value="sector" className="flex items-center gap-2">
-            <Building2 className="h-4 w-4" />
-            Sector
-          </TabsTrigger>
-          <TabsTrigger value="geography" className="flex items-center gap-2">
-            <Globe className="h-4 w-4" />
-            Geography
-          </TabsTrigger>
-          <TabsTrigger value="hazard" className="flex items-center gap-2">
-            <Shield className="h-4 w-4" />
-            Hazard
-          </TabsTrigger>
-          <TabsTrigger value="horizon" className="flex items-center gap-2">
-            <Calendar className="h-4 w-4" />
-            Horizon
-          </TabsTrigger>
-          <TabsTrigger value="drivers" className="flex items-center gap-2">
-            <Target className="h-4 w-4" />
-            Top-N Drivers
-          </TabsTrigger>
-        </TabsList>
+          <TabsContent value="horizon" className="flex-1 min-h-0">
+            <div className="h-full overflow-auto">
+              <HorizonAnalysisView
+                companies={companies}
+                horizon={horizon}
+                pathway={pathway}
+                risk={risk}
+                metric={metric}
+                availableHorizons={HORIZONS}
+              />
+            </div>
+          </TabsContent>
 
-        <TabsContent value="sector" className="flex-1 min-h-0">
-          <div className="h-full overflow-auto">
-            <SectorAnalysisView
-              companies={companies}
-              horizon={horizon}
-              pathway={pathway}
-              risk={risk}
-              metric={metric}
-            />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="geography" className="flex-1 min-h-0">
-          <div className="h-full overflow-auto">
-            <GeographyAnalysisView
-              companies={companies}
-              horizon={horizon}
-              pathway={pathway}
-              risk={risk}
-              metric={metric}
-            />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="hazard" className="flex-1 min-h-0">
-          <div className="h-full overflow-auto">
-            <HazardAnalysisView
-              companies={companies}
-              horizon={horizon}
-              pathway={pathway}
-              risk={risk}
-              metric={metric}
-            />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="horizon" className="flex-1 min-h-0">
-          <div className="h-full overflow-auto">
-            <HorizonAnalysisView
-              companies={companies}
-              horizon={horizon}
-              pathway={pathway}
-              risk={risk}
-              metric={metric}
-              availableHorizons={HORIZONS}
-            />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="drivers" className="flex-1 min-h-0">
-          <div className="h-full overflow-auto">
-            <TopNDriversView
-              companies={companies}
-              horizon={horizon}
-              pathway={pathway}
-              risk={risk}
-              metric={metric}
-              onUpdateWeight={onUpdateWeight}
-              onNormalizeWeights={onNormalizeWeights}
-            />
-          </div>
-        </TabsContent>
-      </Tabs>
+          <TabsContent value="drivers" className="flex-1 min-h-0">
+            <div className="h-full overflow-auto">
+              <TopNDriversView
+                companies={companies}
+                horizon={horizon}
+                pathway={pathway}
+                risk={risk}
+                metric={metric}
+                onUpdateWeight={onUpdateWeight}
+                onNormalizeWeights={onNormalizeWeights}
+              />
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

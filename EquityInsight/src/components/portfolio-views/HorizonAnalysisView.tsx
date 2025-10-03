@@ -131,16 +131,6 @@ export function HorizonAnalysisView({
                     position: "insideLeft",
                   }}
                 />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value, name) => [
-                        `${(Number(value) * 100).toFixed(1)}%`,
-                        name === "score" ? "Risk Score" : "Expected Impact",
-                      ]}
-                    />
-                  }
-                />
                 <ChartLegend content={<ChartLegendContent />} />
                 <Line
                   type="monotone"

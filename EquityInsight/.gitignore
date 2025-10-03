@@ -13,4 +13,4 @@ todos.json
 
 # Cloudflare
 .wrangler
-wrangler.json
+**/wrangler.json

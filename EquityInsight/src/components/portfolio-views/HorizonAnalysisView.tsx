@@ -95,9 +95,9 @@ export function HorizonAnalysisView({
   }
 
   return (
-    <div className="h-full flex flex-col space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full max-w-full">
-        <Card className="flex flex-col">
+    <div className="flex flex-col space-y-6 overflow-y-auto pr-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Risk Evolution Over Time</CardTitle>
             <CardDescription>
@@ -105,53 +105,59 @@ export function HorizonAnalysisView({
               horizons (2025-2100)
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={{
-                horizon: { label: "Time Horizon" },
-                score: { label: "Risk Score", color: "#8884d8" },
-                impact: { label: "Expected Impact", color: "#82ca9d" },
-              }}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <LineChart data={horizonData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="horizon"
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  label={{
-                    value: "Risk Score",
-                    angle: -90,
-                    position: "insideLeft",
-                  }}
-                />
-                <ChartLegend content={<ChartLegendContent />} />
-                <Line
-                  type="monotone"
-                  dataKey="score"
-                  stroke="#8884d8"
-                  strokeWidth={2}
-                  name="Risk Score"
-                />
-                <Line
-                  type="monotone"
-                  dataKey="impact"
-                  stroke="#82ca9d"
-                  strokeWidth={2}
-                  name="Expected Impact"
-                />
-              </LineChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-x-auto">
+              <ChartContainer
+                config={{
+                  horizon: { label: "Time Horizon" },
+                  score: { label: "Risk Score", color: "#8884d8" },
+                  impact: { label: "Expected Impact", color: "#82ca9d" },
+                }}
+                className="h-full w-full"
+              >
+                <LineChart
+                  data={horizonData}
+                  margin={{ left: 20, right: 20, top: 20, bottom: 60 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="horizon"
+                    tick={{ fontSize: 10 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval={0}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10 }}
+                    label={{
+                      value: "Risk Score",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="#8884d8"
+                    strokeWidth={2}
+                    name="Risk Score"
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="impact"
+                    stroke="#82ca9d"
+                    strokeWidth={2}
+                    name="Expected Impact"
+                  />
+                </LineChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Risk Contribution by Horizon</CardTitle>
             <CardDescription>
@@ -159,47 +165,50 @@ export function HorizonAnalysisView({
               score)
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={horizonData.reduce((acc, item, index) => ({
-                ...acc,
-                [item.horizon]: {
-                  label: item.horizon,
-                  color: CHART_COLORS[index % CHART_COLORS.length],
-                },
-              }), {})}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <PieChart>
-                <Pie
-                  data={horizonData}
-                  dataKey="weightedContribution"
-                  nameKey="horizon"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={({ horizon, weightedContribution }) =>
-                    `${horizon}: ${(weightedContribution * 100).toFixed(1)}%`}
-                >
-                  {horizonData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={CHART_COLORS[index % CHART_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) => [
-                        `${(Number(value) * 100).toFixed(1)}%`,
-                        "Risk Contribution",
-                      ]}
-                    />
-                  }
-                />
-              </PieChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-hidden">
+              <ChartContainer
+                config={horizonData.reduce((acc, item, index) => ({
+                  ...acc,
+                  [item.horizon]: {
+                    label: item.horizon,
+                    color: CHART_COLORS[index % CHART_COLORS.length],
+                  },
+                }), {})}
+                className="h-full w-full"
+              >
+                <PieChart>
+                  <Pie
+                    data={horizonData}
+                    dataKey="weightedContribution"
+                    nameKey="horizon"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label={({ horizon, weightedContribution }) =>
+                      `${horizon}: ${(weightedContribution * 100).toFixed(1)}%`}
+                    labelLine={false}
+                  >
+                    {horizonData.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={CHART_COLORS[index % CHART_COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) => [
+                          `${(Number(value) * 100).toFixed(1)}%`,
+                          "Risk Contribution",
+                        ]}
+                      />
+                    }
+                  />
+                </PieChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -212,7 +221,7 @@ export function HorizonAnalysisView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="space-y-4">
             {horizonData.map((horizon) => (
               <div
                 key={horizon.horizon}

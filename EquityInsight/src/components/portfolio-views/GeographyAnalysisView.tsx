@@ -80,9 +80,9 @@ export function GeographyAnalysisView({
   }
 
   return (
-    <div className="h-full flex flex-col space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full max-w-full">
-        <Card className="flex flex-col">
+    <div className="flex flex-col space-y-6 overflow-y-auto pr-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Risk Contribution by Geography</CardTitle>
             <CardDescription>
@@ -90,94 +90,103 @@ export function GeographyAnalysisView({
               score)
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={geographyData.reduce((acc, item, index) => ({
-                ...acc,
-                [item.country]: {
-                  label: item.country,
-                  color: CHART_COLORS[index % CHART_COLORS.length],
-                },
-              }), {})}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <PieChart>
-                <Pie
-                  data={geographyData}
-                  dataKey="weightedContribution"
-                  nameKey="country"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={({ country, weightedContribution }) =>
-                    `${country}: ${(weightedContribution * 100).toFixed(1)}%`}
-                >
-                  {geographyData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={CHART_COLORS[index % CHART_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) => [
-                        `${(Number(value) * 100).toFixed(1)}%`,
-                        "Risk Contribution",
-                      ]}
-                    />
-                  }
-                />
-              </PieChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-hidden">
+              <ChartContainer
+                config={geographyData.reduce((acc, item, index) => ({
+                  ...acc,
+                  [item.country]: {
+                    label: item.country,
+                    color: CHART_COLORS[index % CHART_COLORS.length],
+                  },
+                }), {})}
+                className="h-full w-full"
+              >
+                <PieChart>
+                  <Pie
+                    data={geographyData}
+                    dataKey="weightedContribution"
+                    nameKey="country"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label={({ country, weightedContribution }) =>
+                      `${country}: ${(weightedContribution * 100).toFixed(1)}%`}
+                    labelLine={false}
+                  >
+                    {geographyData.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={CHART_COLORS[index % CHART_COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) => [
+                          `${(Number(value) * 100).toFixed(1)}%`,
+                          "Risk Contribution",
+                        ]}
+                      />
+                    }
+                  />
+                </PieChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Geographic Risk Distribution</CardTitle>
             <CardDescription>
               Portfolio weight distribution by geography
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={geographyData.reduce((acc, item, index) => ({
-                ...acc,
-                [item.country]: {
-                  label: item.country,
-                  color: CHART_COLORS[index % CHART_COLORS.length],
-                },
-              }), {})}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <BarChart data={geographyData}>
-                <XAxis
-                  dataKey="country"
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  label={{
-                    value: "Portfolio Weight (%)",
-                    angle: -90,
-                    position: "insideLeft",
-                  }}
-                />
-                <Bar dataKey="weight" fill="#82ca9d" />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) => [`${value}%`, "Portfolio Weight"]}
-                    />
-                  }
-                />
-              </BarChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-x-auto">
+              <ChartContainer
+                config={geographyData.reduce((acc, item, index) => ({
+                  ...acc,
+                  [item.country]: {
+                    label: item.country,
+                    color: CHART_COLORS[index % CHART_COLORS.length],
+                  },
+                }), {})}
+                className="h-full w-full"
+              >
+                <BarChart
+                  data={geographyData}
+                  margin={{ left: 20, right: 20, top: 20, bottom: 60 }}
+                >
+                  <XAxis
+                    dataKey="country"
+                    tick={{ fontSize: 10 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval={0}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10 }}
+                    label={{
+                      value: "Portfolio Weight (%)",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
+                  <Bar dataKey="weight" fill="#82ca9d" />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) => [`${value}%`, "Portfolio Weight"]}
+                      />
+                    }
+                  />
+                </BarChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -190,7 +199,7 @@ export function GeographyAnalysisView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="space-y-4">
             {geographyData.map((geo) => (
               <div
                 key={geo.country}

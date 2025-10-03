@@ -69,9 +69,9 @@ export function HazardAnalysisView({
   }
 
   return (
-    <div className="h-full flex flex-col space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full max-w-full">
-        <Card className="flex flex-col">
+    <div className="flex flex-col space-y-6 overflow-y-auto pr-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Weighted Risk Contribution</CardTitle>
             <CardDescription>
@@ -79,96 +79,105 @@ export function HazardAnalysisView({
               risk
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={hazardData.reduce((acc, item) => ({
-                ...acc,
-                [item.hazard]: {
-                  label: item.hazard,
-                  color: item.color,
-                },
-              }), {})}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <PieChart>
-                <Pie
-                  data={hazardData}
-                  dataKey="value"
-                  nameKey="hazard"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={({ hazard, value }) =>
-                    `${hazard}: ${(value * 100).toFixed(1)}%`}
-                >
-                  {hazardData.map((entry, idx) => (
-                    <Cell key={`cell-${idx}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) => [
-                        `${(Number(value) * 100).toFixed(1)}%`,
-                        "Weighted Risk Contribution",
-                      ]}
-                    />
-                  }
-                />
-              </PieChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-hidden">
+              <ChartContainer
+                config={hazardData.reduce((acc, item) => ({
+                  ...acc,
+                  [item.hazard]: {
+                    label: item.hazard,
+                    color: item.color,
+                  },
+                }), {})}
+                className="h-full w-full"
+              >
+                <PieChart>
+                  <Pie
+                    data={hazardData}
+                    dataKey="value"
+                    nameKey="hazard"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label={({ hazard, value }) =>
+                      `${hazard}: ${(value * 100).toFixed(1)}%`}
+                    labelLine={false}
+                  >
+                    {hazardData.map((entry, idx) => (
+                      <Cell key={`cell-${idx}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) => [
+                          `${(Number(value) * 100).toFixed(1)}%`,
+                          "Weighted Risk Contribution",
+                        ]}
+                      />
+                    }
+                  />
+                </PieChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Hazard Exposure by Portfolio</CardTitle>
             <CardDescription>
               Portfolio exposure to different climate hazards
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={hazardData.reduce((acc, item) => ({
-                ...acc,
-                [item.hazard]: {
-                  label: item.hazard,
-                  color: item.color,
-                },
-              }), {})}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <BarChart data={hazardData}>
-                <XAxis
-                  dataKey="hazard"
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  label={{
-                    value: "Portfolio Exposure (%)",
-                    angle: -90,
-                    position: "insideLeft",
-                  }}
-                />
-                <Bar dataKey="portfolioExposure" fill="#8884d8" />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(
-                        value,
-                      ) => [
-                        `${(Number(value) * 100).toFixed(1)}%`,
-                        "Portfolio Exposure",
-                      ]}
-                    />
-                  }
-                />
-              </BarChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-x-auto">
+              <ChartContainer
+                config={hazardData.reduce((acc, item) => ({
+                  ...acc,
+                  [item.hazard]: {
+                    label: item.hazard,
+                    color: item.color,
+                  },
+                }), {})}
+                className="h-full w-full"
+              >
+                <BarChart
+                  data={hazardData}
+                  margin={{ left: 20, right: 20, top: 20, bottom: 60 }}
+                >
+                  <XAxis
+                    dataKey="hazard"
+                    tick={{ fontSize: 10 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval={0}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10 }}
+                    label={{
+                      value: "Portfolio Exposure (%)",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
+                  <Bar dataKey="portfolioExposure" fill="#8884d8" />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(
+                          value,
+                        ) => [
+                          `${(Number(value) * 100).toFixed(1)}%`,
+                          "Portfolio Exposure",
+                        ]}
+                      />
+                    }
+                  />
+                </BarChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -181,7 +190,7 @@ export function HazardAnalysisView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="space-y-4">
             {hazardData.map((hazard) => (
               <div
                 key={hazard.hazard}

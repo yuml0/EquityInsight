@@ -80,103 +80,112 @@ export function SectorAnalysisView({
   }
 
   return (
-    <div className="h-full flex flex-col space-y-6">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full max-w-full">
-        <Card className="flex flex-col">
+    <div className="flex flex-col space-y-6 overflow-y-auto pr-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0 w-full">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Risk Contribution by Sector</CardTitle>
             <CardDescription>
               Weighted climate risk contribution by sector (weight × risk score)
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={sectorData.reduce((acc, item, index) => ({
-                ...acc,
-                [item.sector]: {
-                  label: item.sector,
-                  color: CHART_COLORS[index % CHART_COLORS.length],
-                },
-              }), {})}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <PieChart>
-                <Pie
-                  data={sectorData}
-                  dataKey="weightedContribution"
-                  nameKey="sector"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={80}
-                  label={({ sector, weightedContribution }) =>
-                    `${sector}: ${(weightedContribution * 100).toFixed(1)}%`}
-                >
-                  {sectorData.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={CHART_COLORS[index % CHART_COLORS.length]}
-                    />
-                  ))}
-                </Pie>
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) => [
-                        `${(Number(value) * 100).toFixed(1)}%`,
-                        "Risk Contribution",
-                      ]}
-                    />
-                  }
-                />
-              </PieChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-hidden">
+              <ChartContainer
+                config={sectorData.reduce((acc, item, index) => ({
+                  ...acc,
+                  [item.sector]: {
+                    label: item.sector,
+                    color: CHART_COLORS[index % CHART_COLORS.length],
+                  },
+                }), {})}
+                className="h-full w-full"
+              >
+                <PieChart>
+                  <Pie
+                    data={sectorData}
+                    dataKey="weightedContribution"
+                    nameKey="sector"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label={({ sector, weightedContribution }) =>
+                      `${sector}: ${(weightedContribution * 100).toFixed(1)}%`}
+                    labelLine={false}
+                  >
+                    {sectorData.map((_, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={CHART_COLORS[index % CHART_COLORS.length]}
+                      />
+                    ))}
+                  </Pie>
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) => [
+                          `${(Number(value) * 100).toFixed(1)}%`,
+                          "Risk Contribution",
+                        ]}
+                      />
+                    }
+                  />
+                </PieChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="flex flex-col">
+        <Card className="flex flex-col overflow-hidden">
           <CardHeader className="flex-shrink-0">
             <CardTitle>Sector Risk Distribution</CardTitle>
             <CardDescription>
               Portfolio weight distribution by sector
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex-1 min-h-0">
-            <ChartContainer
-              config={sectorData.reduce((acc, item, index) => ({
-                ...acc,
-                [item.sector]: {
-                  label: item.sector,
-                  color: CHART_COLORS[index % CHART_COLORS.length],
-                },
-              }), {})}
-              className="h-full min-h-[250px] max-h-[400px] w-full max-w-full"
-            >
-              <BarChart data={sectorData}>
-                <XAxis
-                  dataKey="sector"
-                  tick={{ fontSize: 12 }}
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                />
-                <YAxis
-                  tick={{ fontSize: 12 }}
-                  label={{
-                    value: "Portfolio Weight (%)",
-                    angle: -90,
-                    position: "insideLeft",
-                  }}
-                />
-                <Bar dataKey="totalWeight" fill="#8884d8" />
-                <ChartTooltip
-                  content={
-                    <ChartTooltipContent
-                      formatter={(value) => [`${value}%`, "Portfolio Weight"]}
-                    />
-                  }
-                />
-              </BarChart>
-            </ChartContainer>
+          <CardContent className="flex-1 min-h-0 p-4">
+            <div className="w-full h-full overflow-x-auto">
+              <ChartContainer
+                config={sectorData.reduce((acc, item, index) => ({
+                  ...acc,
+                  [item.sector]: {
+                    label: item.sector,
+                    color: CHART_COLORS[index % CHART_COLORS.length],
+                  },
+                }), {})}
+                className="h-full min-h-[250px] max-h-[400px] w-full min-w-[300px]"
+              >
+                <BarChart
+                  data={sectorData}
+                  margin={{ left: 20, right: 20, top: 20, bottom: 60 }}
+                >
+                  <XAxis
+                    dataKey="sector"
+                    tick={{ fontSize: 10 }}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                    interval={0}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10 }}
+                    label={{
+                      value: "Portfolio Weight (%)",
+                      angle: -90,
+                      position: "insideLeft",
+                    }}
+                  />
+                  <Bar dataKey="totalWeight" fill="#8884d8" />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        formatter={(value) => [`${value}%`, "Portfolio Weight"]}
+                      />
+                    }
+                  />
+                </BarChart>
+              </ChartContainer>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -189,7 +198,7 @@ export function SectorAnalysisView({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4 max-h-96 overflow-y-auto">
+          <div className="space-y-4">
             {sectorData.map((sector) => (
               <div
                 key={sector.sector}

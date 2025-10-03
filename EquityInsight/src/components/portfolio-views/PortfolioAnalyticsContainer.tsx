@@ -189,11 +189,11 @@ export function PortfolioAnalyticsContainer({
   ]);
 
   return (
-    <div className="h-full flex flex-col lg:flex-row gap-6">
+    <div className="h-full flex flex-col lg:flex-row gap-4 lg:gap-6">
       {/* Left Panel - Summary and Filters */}
-      <div className="lg:w-1/3 space-y-6 flex flex-col">
+      <div className="lg:w-1/3 space-y-4 lg:space-y-6 flex flex-col">
         {/* Portfolio Summary */}
-        <div className="grid grid-cols-2 gap-4 flex-shrink-0">
+        <div className="grid grid-cols-2 gap-2 sm:gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">
@@ -363,26 +363,46 @@ export function PortfolioAnalyticsContainer({
           onValueChange={setActiveTab}
           className="flex-1 flex flex-col min-h-0"
         >
-          <TabsList className="grid w-full grid-cols-5 flex-shrink-0">
-            <TabsTrigger value="sector" className="flex items-center gap-2">
-              <Building2 className="h-4 w-4" />
-              Sector
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 flex-shrink-0 text-xs sm:text-sm">
+            <TabsTrigger
+              value="sector"
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+            >
+              <Building2 className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Sector</span>
+              <span className="sm:hidden">S</span>
             </TabsTrigger>
-            <TabsTrigger value="geography" className="flex items-center gap-2">
-              <Globe className="h-4 w-4" />
-              Geography
+            <TabsTrigger
+              value="geography"
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+            >
+              <Globe className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Geography</span>
+              <span className="sm:hidden">G</span>
             </TabsTrigger>
-            <TabsTrigger value="hazard" className="flex items-center gap-2">
-              <Shield className="h-4 w-4" />
-              Hazard
+            <TabsTrigger
+              value="hazard"
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+            >
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Hazard</span>
+              <span className="sm:hidden">H</span>
             </TabsTrigger>
-            <TabsTrigger value="horizon" className="flex items-center gap-2">
-              <Calendar className="h-4 w-4" />
-              Horizon
+            <TabsTrigger
+              value="horizon"
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+            >
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Horizon</span>
+              <span className="sm:hidden">T</span>
             </TabsTrigger>
-            <TabsTrigger value="drivers" className="flex items-center gap-2">
-              <Target className="h-4 w-4" />
-              Top-N Drivers
+            <TabsTrigger
+              value="drivers"
+              className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm"
+            >
+              <Target className="h-3 w-3 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline">Top-N Drivers</span>
+              <span className="sm:hidden">D</span>
             </TabsTrigger>
           </TabsList>
 
